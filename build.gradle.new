@@ -1,0 +1,21 @@
+/*
+  Build configureation for the ImageLab project. Updated from gradle 5.6.3 to 8.3
+*/
+
+
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+
+    // Apply the application plugin to add support for building a CLI application
+    id 'application'
+
+    // Apply the jacoco plugin to add support for junit code coverage analysis
+    id 'jacoco'
+
+    // Apply the checkstyle plugin to add support for adherence to coding conventions
+    id 'checkstyle'
+}
+repositories {
+    jcenter() 
+}
