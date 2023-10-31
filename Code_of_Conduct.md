@@ -34,7 +34,7 @@ This Code of Conduct applies within all community spaces and also applies when a
 
 ## Enforcement
 
-If you or someone you know has experienced this type of behavior, please don't hesitate to reach out to the maintainer of the project directly at pauljod@msudenver.edu. Let's handle issues maturely and constructively. 
+If you or someone you know has experienced this type of behavior, please don't hesitate to reach out to the maintainer of the project directly at 8ibu5tidm20t@opayq.com. Let's handle issues maturely and constructively. 
 
 ## Enforcement Guidelines
 
