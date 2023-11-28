@@ -4,18 +4,117 @@
 
 
 plugins {
-    // Apply the java plugin to add support for Java
     id 'java'
-
-    // Apply the application plugin to add support for building a CLI application
     id 'application'
-
-    // Apply the jacoco plugin to add support for junit code coverage analysis
     id 'jacoco'
-
-    // Apply the checkstyle plugin to add support for adherence to coding conventions
     id 'checkstyle'
 }
+
 repositories {
-    jcenter() 
+    jcenter()
 }
+
+dependencies {
+    implementation 'junit:junit:4.12'
+    // implementation 'com.google.guava:guava:28.0-jre'
+    testImplementation 'junit:junit:4.12'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs('imagelab','filters','sound', projectDir)
+        }
+    }
+
+    test {
+        java {
+            srcDirs('imagelab','filters','sound', projectDir)
+        }
+    }
+}
+
+application {
+    mainClassName = 'Run'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'Run'
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnit()
+    reports.html.destination = file("$buildDir/reports/JUnit")
+}
+
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        csv.enabled false
+        html.destination file("$buildDir/reports/jacoco")
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = 0.85
+            }
+        }
+    }
+}
+
+task checkstyle(type: Checkstyle) {
+    ignoreFailures = true
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+task moveClassFilesToRootDirs(type: Copy) {
+    from ('build/classes/java/main/filters')
+    into 'filters/'
+    
+    from ('build/classes/java/main/imagelab')
+    into 'imagelab/'
+    
+    from ('build/classes/java/main/sound')
+    into 'sound/'
+    
+    from ('build/classes/java/main')
+    into projectDir
+    
+    from ('build/libs')
+    into projectDir
+}
+
+task removeBuildDirs(type: Delete) {
+    delete 'build/classes'
+    delete 'build/libs'
+}
+
+task removeClassFilesFromRootDirs(type: Delete) {
+    delete fileTree("filters").include("**/*.class")
+    delete fileTree("imagelab").include("**/*.class")
+    delete fileTree("sound").include("**/*.class")
+    delete fileTree(projectDir).include("Run.class")
+}
+
+moveClassFilesToRootDirs.dependsOn build
+build.finalizedBy moveClassFilesToRootDirs, removeBuildDirs, removeClassFilesFromRootDirs
