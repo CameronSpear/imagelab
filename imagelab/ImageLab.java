@@ -1,7 +1,6 @@
 package imagelab;
 
 /* ImageLab.java */
-
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -16,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 
 /**
  * ImageLab is a platform for image filter development.  ImageLab
@@ -288,40 +288,66 @@ public class ImageLab {
      *
      * @return the ActionListener used to perform opening the image file
      */
+
+
+
     public static ActionListener makeOpenListener() {
         return new ActionListener() {
             public void actionPerformed(final ActionEvent e) {
                 ImgProvider improvider; // Hold the image
                 FileDialog fd;
-                boolean refresh = false;
-                String theFile = " "; //create a string so that they can change in the loop
-                //without hindering the last part of the code
-                String theDir =" ";
-                while (refresh == false)
-                {
-                    fd = new FileDialog(frame, "Pick an image", FileDialog.LOAD);
-                    fd.setVisible(true);
-                    theFile = fd.getFile();
-                    theDir = fd.getDirectory();
+                String theFile; // File name
+                String theDir; // Directory name
+                fd = new FileDialog(frame, "Pick an image", FileDialog.LOAD);
+                fd.setVisible(true);
+                theFile = fd.getFile();
+                theDir = fd.getDirectory();
 
-                    // Check if theFile is null
-                    if (theFile == null) {
-                        // No file was selected, return from the method
-                        return;
-                    }
+                // Check if theFile is null
+                if (theFile == null) {
+                    // No file was selected, return from the method
+                    return;
+                }
 
-                    int test = theFile.lastIndexOf('.');
-                    String fileType = theFile.substring(test+1);
-                    refresh = (fileType.equals("gif") || fileType.equals("jpg") || fileType.equals("png") || fileType.equals("bmp") ); }
-                improvider = new ImgProvider(theDir + theFile);
-                improvider.setLab(theLab);
-                improvider.showImage(theDir + theFile);
-                images.add(improvider);
-                impro = improvider; //current image provider is set
-            } //actionPerformed
+                String fileExtension = getFileExtension(new File(theDir + theFile));
+                if (isImageFile(fileExtension)) {
+                    improvider = new ImgProvider(theDir + theFile);
+                    improvider.setLab(theLab);
+                    improvider.showImage(theDir + theFile);
+                    images.add(improvider);
+                    impro = improvider;
+                } else {
+                    // Handle the case where a non-image file is selected
+                    JOptionPane.showMessageDialog(frame, "Selected file is not a recognized image format.");
+                }
+            }
         };
     } // makeOpenListener
 
+    private static String getFileExtension(File file) {
+        String fileName = file.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        else return "";
+    }
+
+    private static boolean isImageFile(String extension) {
+        String[] imageTypes = ImageIO.getReaderFileSuffixes();
+        for (String type : imageTypes) {
+            if (type.equalsIgnoreCase(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // getFileExtension method extracts the file extension from the file name.
+    // isImageFile method checks if the file's extension matches any of the image file types supported by ImageIO.
+    // makeOpenListener method has been updated to use these new methods for file type validation.
+
+
+
+
+    
     /**
      * Marks an image as the one in focus.
      *
